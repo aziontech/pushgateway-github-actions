@@ -2,14 +2,16 @@ on: [push]
 
 jobs:
   hello_world_job:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    container:
+      image: ubuntu:latest
     name: POST on Pushgateway
     steps:
       - name: POST on Pushgateway
-        uses: cirolini/pushgateway-github-actions@v1
+        uses: aziontech/pushgateway-github-actions@v1
         with:
-          pushgateway_url: 'https://7e39-2804-14d-4cd6-82a8-88e1-e45c-be84-933a.sa.ngrok.io'
-          job: "JobB"
-          metric_name: "github_action_pushgateway"
-          metric_description: "Test on github actions push metrics to Prometheus Pushgateway"
-          metric_labels: "{'version': '1.0'}"
+	  pushgateway_url: 'http://pushgateway.infra.azion.net:9091/metrics/'
+	  job: "deployments"
+	  metric_name: "deployment_success"
+	  metric_description: "Deployment Success in Azion CICD pipeline"
+	  metric_labels: "{app='pushgateway-github-actions',env='prod',version='1.0'}"
