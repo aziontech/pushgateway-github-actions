@@ -10,8 +10,8 @@ jobs:
       - name: POST on Pushgateway
         uses: aziontech/pushgateway-github-actions@v1
         with:
-	  pushgateway_url: 'http://pushgateway.infra.azion.net:9091/metrics/'
-	  job: "deployments"
-	  metric_name: "deployment_success"
-	  metric_description: "Deployment Success in Azion CICD pipeline"
-	  metric_labels: "{app='pushgateway-github-actions',env='prod',version='1.0'}"
+          pushgateway_url: 'http://pushgateway.infra.azion.net:9091'
+          job: "deployments"
+          metric_name: "deployment_success"
+          metric_description: "Deployment Success in Azion CICD pipeline"
+          metric_labels: "{app='pushgateway-github-actions',env='prod',version='1.0'}"
