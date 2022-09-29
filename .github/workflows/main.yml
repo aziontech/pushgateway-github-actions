@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - name: Bumping version
         id: bump
         continue-on-error: true
@@ -25,5 +26,6 @@ jobs:
           pushgateway_url: 'http://pushgateway.infra.azion.net:9091'
           job: "deployments"
           metric_name: "deployment_success"
-          metric_description: "Deployment Success in Azion CICD pipeline"
-          metric_labels: "{app='pushgateway-github-actions',env='prod',version='$VERSION'}"
+          metric_description: "Deployment Frequency of Azion CICD pipeline"
+          metric_labels: "{'stack':'tools','app':'pushgateway-github-actions','env':'stage','version':'$VERSION'}"
+
