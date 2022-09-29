@@ -1,12 +1,24 @@
 on: [push]
 
 jobs:
-  hello_world_job:
-    runs-on: self-hosted
+  example:
+    runs-on: ubuntu-latest
     container:
-      image: ubuntu:latest
-    name: POST on Pushgateway
+      image: azionedge/python-base:latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Bumping version
+        id: bump
+        continue-on-error: true
+        run: |
+          VERSION=`python version.py bump`
+          git tag $VERSION
+          git push origin $VERSION --force
+          echo "::set-output name=VERSION::$VERSION"
+          echo Current ver: $VERSION
+
       - name: POST on Pushgateway
         uses: aziontech/pushgateway-github-actions@v1
         with:
@@ -14,4 +26,4 @@ jobs:
           job: "deployments"
           metric_name: "deployment_success"
           metric_description: "Deployment Success in Azion CICD pipeline"
-          metric_labels: "{app='pushgateway-github-actions',env='prod',version='1.0'}"
+          metric_labels: "{app='pushgateway-github-actions',env='prod',version='$VERSION'}"
