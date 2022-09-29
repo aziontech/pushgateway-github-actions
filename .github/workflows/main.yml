@@ -14,7 +14,7 @@ jobs:
         id: bump
         continue-on-error: true
         run: |
-          VERSION=`python version.py bump`
+          VERSION=$(curl -O https://raw.githubusercontent.com/aziontech/pushgateway-github-actions/main/version.py && python version.py bump)
           git tag $VERSION
           git push origin $VERSION --force
           echo "::set-output name=VERSION::$VERSION"
