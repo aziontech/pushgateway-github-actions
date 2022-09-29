@@ -1,37 +1,51 @@
 # Pushgateway github action
 
-This action a small Github Actions to send metrics in pipelines to [Prometheus](https://github.com/prometheus/prometheus) through [Pushgateway](https://github.com/prometheus/pushgateway).
+Quick way to versioning and push deployment metrics to [Prometheus](https://github.com/prometheus/prometheus) through [Pushgateway](https://github.com/prometheus/pushgateway).
 
-## Inputs
-
-## `pushgateway_url`
-
-**Required** URL of your Pushgateway. Default `"http://localhost:9091/"`.
-
-## `job`
-
-**Required** Job Name. Default `"JobA"`.
-
-## `metric_name`
-
-**Required** The name of the metric you want to create/update. Default `"new_metric"`.
-
-## `metric_description`
-
-**Required** The description of the metric you want to create/update. Default `"metric description"`.
-
-## `metric_labels`
-
-**Required** he list of labels for your metric. Default `"{'version': '1.0'}"`.
 
 ## Example usage
 
 ```
-uses: aziontech/pushgateway-github-actions@v1
-with:
-  pushgateway_url: 'https://31dd-189-6-240-216.sa.ngrok.io/'
-  job: "JobB"
-  metric_name: "github_action_pushgateway"
-  metric_description: "Test on github actions push metrics to Prometheus Pushgateway"
-  metric_labels: "{'version': '1.0'}"
+      - name: POST on Pushgateway
+        uses: aziontech/pushgateway-github-actions@v1
+        with:
+          pushgateway_url: 'http://pushgateway.infra.azion.net:9091'
+          job: "deployments"
+          metric_name: "deployment_success"
+          metric_description: "Deployment Frequency of Azion CICD pipeline"
+          metric_labels: "{'stack':'tools','app':'pushgateway-github-actions','env':'stage','version':'$VERSION'}"
+
 ```
+
+Complete context (bump version, tag it, push the metric):
+```
+  example:
+    runs-on: self-hosted
+    container:
+      image: azionedge/python-base:latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Bumping version
+        id: bump
+        continue-on-error: true
+        run: |
+          VERSION=$(curl -O https://raw.githubusercontent.com/aziontech/pushgateway-github-actions/main/version.py && python version.py bump)
+          git tag $VERSION
+          git push origin $VERSION --force
+          echo "::set-output name=VERSION::$VERSION"
+          echo Current ver: $VERSION
+
+      - name: POST on Pushgateway
+        uses: aziontech/pushgateway-github-actions@v1
+        with:
+          pushgateway_url: 'http://pushgateway.infra.azion.net:9091'
+          job: "deployments"
+          metric_name: "deployment_success"
+          metric_description: "Deployment Frequency of Azion CICD pipeline"
+          metric_labels: "{'stack':'tools','app':'pushgateway-github-actions','env':'stage','version':'$VERSION'}"
+```
+
+Please use the information from the [Risk Managment](https://docs.google.com/document/d/1Ys2p-eEB3o7y12E__BfJ2kF6-LeBeOdx5ptTXidLlHo/edit#) for your `stack` and `app` values.
